@@ -1,0 +1,5 @@
+entry = [
+    "./**/*.go",
+]
+
+output = "./.bundle/anki.bundle"

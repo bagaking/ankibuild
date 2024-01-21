@@ -1,0 +1,12 @@
+title = "TheExampleBarn"  # Optional. If not provided, the file name is used as the deck name.
+
+[[q_a]]
+question = "question 1"
+answer = "ans 1"
+
+[[q_a]]
+question = "are multi-line ans supported"
+answer = """of course,
+you can try this
+by yourself
+"""
