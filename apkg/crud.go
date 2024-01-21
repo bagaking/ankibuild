@@ -21,17 +21,21 @@ func (p *PkgInfo) CardService() *CardService {
 	return &CardService{DB: p.DB}
 }
 
-func (cs *CardService) CreateNote(flds string, tags ...string) (*Note, error) {
-	noteID := genID()
+func (cs *CardService) CreateNote(nid int, front, back string, tags ...string) (*Note, error) {
 	guid, err := genGUID()
 	if err != nil {
 		return nil, err
 	}
 
+	if nid == 0 {
+		nid = genID()
+	}
+
 	tags = append(GlobalTags, tags...)
+	flds := makeFlds(front, back)
 	// 创建Note
 	note := &Note{
-		ID:   noteID,
+		ID:   nid,
 		Guid: guid,
 		Mid:  SimpleTplID, //  collection.ModelsID, // 模板ID
 		Mod:  time.Now().Unix(),
@@ -50,17 +54,16 @@ func (cs *CardService) CreateNote(flds string, tags ...string) (*Note, error) {
 }
 
 // CreateCard creates a new card based on the given front and back information.
-func (cs *CardService) CreateCard(front, back string, tags ...string) (*Note, *Card, error) {
+func (cs *CardService) CreateCard(cid int, note *Note) (*Card, error) {
 	// 创建Note
-	note, err := cs.CreateNote(front+"\x1f"+back, tags...)
-	if err != nil {
-		return nil, nil, err
+	if cid == 0 {
+		cid = genID()
 	}
 
 	card := &Card{
-		ID:  genID(),
-		Nid: note.ID,
-		Did: VirtualDeckID, // Deck ID
+		ID:  cid,
+		NID: note.ID,
+		DID: VirtualDeckID, // Deck ID
 		Mod: time.Now().Unix(),
 		//Usn:   cs.DB.GetNextUsn(), // Update Sequence Number
 		Type:  CardTypeNew,
@@ -71,10 +74,10 @@ func (cs *CardService) CreateCard(front, back string, tags ...string) (*Note, *C
 	}
 
 	if err := cs.DB.Create(card).Error; err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return note, card, nil
+	return card, nil
 }
 
 // GetAllFronts returns a slice of all fronts from notes.
@@ -116,4 +119,8 @@ func (cs *CardService) FindCardByFront(front string) ([]Note, []Card, error) {
 	}
 
 	return notes, cards, nil
+}
+
+func makeFlds(front, back string) string {
+	return strings.Join([]string{front, back}, SplitFieldOfNote)
 }

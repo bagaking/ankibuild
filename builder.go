@@ -44,16 +44,43 @@ func BuildAPKGsFromToml(ctx context.Context) error {
 		defer pkgInfo.Close()
 
 		//创建每个卡片并添加到 apkg 包中
-		for _, card := range conf.QnAs {
+		for i := range conf.QnAs {
+			card := conf.QnAs[i]
 			log.Infof("create card，q= %s，a= %s", card.Question, card.Answer)
 
 			combinedTags := append(conf.Tags, card.Tags...)
-			n, c, err := pkgInfo.CardService().CreateCard(card.Question, card.Answer, combinedTags...)
-			if err != nil {
+
+			// 检查是否存在runtime信息，如果存在，则使用现有的NID和CID
+			noteID := card.GetNoteID()
+			cardID := card.GetCardID()
+
+			var n *apkg.Note
+			var c *apkg.Card
+
+			if n, err = pkgInfo.CardService().CreateNote(noteID, card.Question, card.Answer, combinedTags...); err != nil {
+				return err
+			}
+
+			if c, err = pkgInfo.CardService().CreateCard(cardID, n); err != nil {
 				return err
 			}
 			log.Infof("card created，q= %s，a= %s, n= %+v, c= %+v", card.Question, card.Answer, n, c)
 
+			// Update and save runtime information if enabled
+			if conf.RuntimeEnabled {
+				newCard, err := updateCardRuntime(n, c, card)
+				if err != nil {
+					return err
+				}
+				conf.QnAs[i] = *newCard
+			}
+		}
+
+		// If RuntimeEnabled is true, write back the runtime information to the TOML configuration file.
+		if conf.RuntimeEnabled {
+			if err = writeRuntimeBack(&conf, pth); err != nil {
+				return err
+			}
 		}
 		return pkgInfo.ExportToAPKG(filepath.Join(outDir, fileName+".apkg"))
 	})

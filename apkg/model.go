@@ -1,6 +1,12 @@
 package apkg
 
-import "gorm.io/gorm"
+import (
+	"strings"
+
+	"gorm.io/gorm"
+)
+
+const SplitFieldOfNote = "\x1f"
 
 // Col represents the 'col' table which contains information about the collection like settings and statistics.
 type Col struct {
@@ -54,6 +60,10 @@ type Note struct {
 	Data  string `gorm:"column:data" json:"data"`   // Unused, currently just an empty string.
 }
 
+func (n *Note) Front() string {
+	return strings.Split(n.Flds, SplitFieldOfNote)[0]
+}
+
 // todo: 猜测
 const (
 	CardTypeNew = iota
@@ -77,8 +87,10 @@ const (
 type Card struct {
 	ID int `gorm:"primaryKey;column:id" json:"id"` // Unique identifier for the card
 
-	Nid int `gorm:"column:nid" json:"nid"` // Note ID
-	Did int `gorm:"column:did" json:"did"` // Deck ID
+	// NID - Note ID
+	NID int `gorm:"column:nid" json:"nid"`
+	// DID - Deck ID
+	DID int `gorm:"column:did" json:"did"`
 
 	// Ord - Ordinal, identifies card's template
 	Ord int `gorm:"column:ord" json:"ord"`

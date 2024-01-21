@@ -3,10 +3,12 @@ package apkg
 import (
 	"context"
 	"fmt"
-	"github.com/bagaking/goulp/wlog"
+	"os"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"os"
+
+	"github.com/bagaking/goulp/wlog"
 )
 
 const (
