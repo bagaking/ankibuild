@@ -12,16 +12,17 @@ import (
 	"github.com/bagaking/goulp/wlog"
 )
 
-// BuildAPKGsFromConfig searches for .apkg.md files in the current directory and subdirectories
+// BuildAPKGsFromToml searches for .apkg.md files in the current directory and subdirectories
 // and generates .apkg files accordingly.
-func BuildAPKGsFromConfig(ctx context.Context) error {
-	log := wlog.ByCtx(ctx, "BuildAPKGsFromConfig")
+func BuildAPKGsFromToml(ctx context.Context) error {
+	log := wlog.ByCtx(ctx, "BuildAPKGsFromToml")
 
 	return filepath.Walk(".", func(pth string, info os.FileInfo, err error) error {
 		if !strings.HasSuffix(info.Name(), ".apkg.toml") {
 			return nil
 		}
-		config, err := parseConfigFromFile(pth)
+
+		conf, err := parseConfigFromFile(pth)
 		log.Infof("find path= %s", pth)
 
 		outDir := filepath.Dir(pth)
@@ -31,9 +32,10 @@ func BuildAPKGsFromConfig(ctx context.Context) error {
 		}
 
 		fileName := strings.TrimSuffix(info.Name(), ".apkg.toml")
-		if config.Title != "" {
-			fileName = config.Title
+		if conf.Title != "" {
+			fileName = conf.Title
 		}
+
 		/* 这里注释下一步的代码，等到我们的 apkg 的包实现创建 apkg 文件的方法之后再解除注释 */
 		pkgInfo, err := apkg.CreatePkgInfo(ctx, outDir) // 你的输出文件夹路径
 		if err != nil {
@@ -42,10 +44,11 @@ func BuildAPKGsFromConfig(ctx context.Context) error {
 		defer pkgInfo.Close()
 
 		//创建每个卡片并添加到 apkg 包中
-		for _, card := range config.QnAs {
+		for _, card := range conf.QnAs {
 			log.Infof("create card，q= %s，a= %s", card.Question, card.Answer)
-			// 添加卡片进入 apkg 包
-			n, c, err := pkgInfo.CardService().CreateCard(card.Question, card.Answer)
+
+			combinedTags := append(conf.Tags, card.Tags...)
+			n, c, err := pkgInfo.CardService().CreateCard(card.Question, card.Answer, combinedTags...)
 			if err != nil {
 				return err
 			}

@@ -27,6 +27,7 @@ func (cs *CardService) CreateNote(flds string, tags ...string) (*Note, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	tags = append(GlobalTags, tags...)
 	// 创建Note
 	note := &Note{
@@ -51,7 +52,7 @@ func (cs *CardService) CreateNote(flds string, tags ...string) (*Note, error) {
 // CreateCard creates a new card based on the given front and back information.
 func (cs *CardService) CreateCard(front, back string, tags ...string) (*Note, *Card, error) {
 	// 创建Note
-	note, err := cs.CreateNote(front + "\x1f" + back)
+	note, err := cs.CreateNote(front+"\x1f"+back, tags...)
 	if err != nil {
 		return nil, nil, err
 	}

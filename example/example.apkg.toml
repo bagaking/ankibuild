@@ -1,8 +1,10 @@
 title = "TheExampleBarn"  # Optional. If not provided, the file name is used as the deck name.
+tags = ["physics", "science"]
 
 [[q_a]]
 question = "question 1"
 answer = "ans 1"
+tags = ["algorithms", "complexity"]
 
 [[q_a]]
 question = "are multi-line ans supported"

@@ -2,4 +2,4 @@ entry = [
     "./**/*.go",
 ]
 
-output = "./.bundle/anki.bundle"
+output = "./_bundle/anki.bundle"

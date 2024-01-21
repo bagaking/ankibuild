@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	err := BuildAPKGsFromConfig(context.Background())
+	err := BuildAPKGsFromToml(context.Background())
 	if err != nil {
 		log.Fatal(err)
 	}
