@@ -2,10 +2,9 @@ package apkg
 
 import (
 	"errors"
+	"gorm.io/gorm"
 	"strings"
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // ErrNoteNotFound is returned when a note cannot be found.
@@ -19,38 +18,6 @@ type CardService struct {
 
 func (p *PkgInfo) CardService() *CardService {
 	return &CardService{DB: p.DB}
-}
-
-func (cs *CardService) CreateNote(nid int, front, back string, tags ...string) (*Note, error) {
-	guid, err := genGUID()
-	if err != nil {
-		return nil, err
-	}
-
-	if nid == 0 {
-		nid = genID()
-	}
-
-	tags = append(GlobalTags, tags...)
-	flds := makeFlds(front, back)
-	// 创建Note
-	note := &Note{
-		ID:   nid,
-		Guid: guid,
-		Mid:  SimpleTplID, //  collection.ModelsID, // 模板ID
-		Mod:  time.Now().Unix(),
-		//Usn:  cs.DB.GetNextUsn(), // Update Sequence Number
-		Tags: strings.Join(tags, " "),
-		Flds: flds,
-		Sfld: generateSortField(flds), // 生成排序字段
-		Csum: calculateChecksum(flds), // 内容校验和
-	}
-
-	if err := cs.DB.Create(note).Error; err != nil {
-		return nil, err
-	}
-
-	return note, nil
 }
 
 // CreateCard creates a new card based on the given front and back information.

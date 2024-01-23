@@ -3,12 +3,11 @@ package apkg
 import (
 	"context"
 	"fmt"
+	"github.com/bagaking/goulp/wlog"
 	"os"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-
-	"github.com/bagaking/goulp/wlog"
 )
 
 const (
@@ -50,7 +49,7 @@ func CreatePkgInfo(ctx context.Context, path string) (*PkgInfo, error) {
 		defer pkgInfo.Close()
 		return nil, err
 	}
-	wlog.ByCtx(ctx, "CreatePkgInfo").Infof("deck initialed, %+v", col)
+	wlog.ByCtx(ctx, "CreatePkgInfo").Infof("deck initialed, %+v", col.ID)
 
 	return pkgInfo, nil
 }

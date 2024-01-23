@@ -11,20 +11,21 @@ import (
 )
 
 // updateCardRuntime Updates the runtime information of the configuration with the IDs of the created note and card.
-func updateCardRuntime(note *apkg.Note, card *apkg.Card, cardConf QnACard) (*QnACard, error) {
+func updateCardRuntime(cardConf QnACard, note *apkg.Note, card *apkg.Card) (*QnACard, error) {
 	if cardConf.Question != note.Front() {
 		return nil, fmt.Errorf("write card runtime back failed, cardConf= %v", cardConf)
 	}
 	cardConf.Runtime = CardRuntime{
-		NoteID: note.ID,
-		CardID: card.ID,
+		NoteID:   note.ID,
+		NoteGUID: note.Guid,
+		CardID:   card.ID,
 	}
 	return &cardConf, nil
 }
 
 // writeRuntimeBack writes the runtime information back into the original .apkg.toml configuration file.
 // writeRuntimeBack writes the runtime information back into the original .apkg.toml configuration file with a backup.
-func writeRuntimeBack(conf *KnowledgePage, filePath string) error {
+func writeRuntimeBack(conf *Barn, filePath string) error {
 	// Generate the backup file name with timestamp
 	timeStamp := time.Now().Format("20060102150405")
 	backupFilePath := filePath + "." + timeStamp + ".bak"

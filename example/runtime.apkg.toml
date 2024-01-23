@@ -1,14 +1,13 @@
-title = "RuntimeExampleBarn"  # Optional. If not provided, the file name is used as the deck name.
+title = "RuntimeExampleBarn"
+tags = ["complexity"]
+content_fmt = "markdown"
 runtime = true
 
 [[q_a]]
-question = "question 1"
-answer = "ans 1"
-tags = ["algorithms", "complexity"]
-
-[[q_a]]
-question = "are multi-line ans supported"
-answer = """of course,
-you can try this
-by yourself
-"""
+  question = "this is a runtime example"
+  answer = "# runtime ans\n\n  - 1\n  "
+  tags = ["algorithms", "complexity"]
+  [q_a.runtime]
+    cid = 1705923679008
+    nid = 1705923679007
+    guid = "cHuNXOn9hM"

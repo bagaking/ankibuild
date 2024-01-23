@@ -1,5 +1,6 @@
-title = "TheExampleBarn"  # Optional. If not provided, the file name is used as the deck name.
-tags = ["physics", "science"]
+title = "TheExampleBarn"
+tags = ["physics"]
+content_fmt = "markdown"
 
 [[q_a]]
 question = "question 1"
@@ -8,7 +9,9 @@ tags = ["algorithms", "complexity"]
 
 [[q_a]]
 question = "are multi-line ans supported"
-answer = """of course,
-you can try this
-by yourself
+answer = """of course ~
+
+- you can try this
+- by yourself
 """
+tags = ["algorithms"]

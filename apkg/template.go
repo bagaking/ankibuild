@@ -57,7 +57,7 @@ type TplModel struct {
 	Gf        bool          `json:"gf"`
 }
 
-func (cs *PkgInfo) CreateSimpleDeck(id int) (*Col, error) {
+func (p *PkgInfo) CreateSimpleDeck(id int) (*Col, error) {
 	// 创建一个简单模板实例
 	simpleTpl := TplModel{
 		ID:   id,
@@ -106,22 +106,21 @@ func (cs *PkgInfo) CreateSimpleDeck(id int) (*Col, error) {
 	}
 
 	// 在数据库中创建牌组
-	if err := cs.DB.Create(col).Error; err != nil {
+	if err := p.DB.Create(col).Error; err != nil {
 		return nil, err
 	}
 
 	return col, nil
 }
 
-func (cs *PkgInfo) FindOrCreateSimpleDeck() (*Col, error) {
+func (p *PkgInfo) FindOrCreateSimpleDeck() (*Col, error) {
 	var col Col
 	// 在数据库中尝试找到现有的Col
-	err := cs.DB.Where("id > ?", 0).First(&col).Error
-
+	err := p.DB.Where("id > ?", 0).First(&col).Error
 	// 如果找到了，直接返回找到的Col
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		// 如果不存在，则创建一个新的Col
-		return cs.CreateSimpleDeck(SimpleTplID)
+		return p.CreateSimpleDeck(SimpleTplID)
 	} else if err != nil {
 		// 如果发生了其他错误，则返回错误
 		return nil, err

@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
-	"log"
+
+	"github.com/bagaking/goulp/wlog"
 )
 
 func main() {
-	err := BuildAPKGsFromToml(context.Background())
+	ctx := context.Background()
+
+	err := BuildAPKGsFromToml(ctx)
 	if err != nil {
-		log.Fatal(err)
+		wlog.ByCtx(ctx).Fatal(err)
 	}
 }
