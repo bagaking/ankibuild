@@ -22,6 +22,7 @@ type (
 
 		InheritableConf
 
+		// todo: 考虑把这个拆出来，不过怎么建立索引关系是个问题，源文件里的 query 是一个动态变化的值
 		Runtime CardRuntime `toml:"runtime,omitempty"`
 	}
 

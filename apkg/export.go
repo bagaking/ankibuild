@@ -9,13 +9,13 @@ import (
 )
 
 // ExportToAPKG exports the database and associated files as an .apkg file.
-func (p *PkgInfo) ExportToAPKG(exportPath string) error {
+func (deck *Deck) ExportToAPKG(exportPath string) error {
 	// Close the database to ensure no pending operations
-	p.Close()
+	deck.Close()
 
-	apkgName := exportPath //filepath.Join(exportPath, "collection.apkg")
+	aPkgName := exportPath //filepath.Join(exportPath, "collection.apkg")
 	// Create a new zip file
-	zipFile, err := os.Create(apkgName)
+	zipFile, err := os.Create(aPkgName)
 	if err != nil {
 		return err
 	}
@@ -24,7 +24,7 @@ func (p *PkgInfo) ExportToAPKG(exportPath string) error {
 	archive := zip.NewWriter(zipFile)
 	defer archive.Close()
 
-	collectionPth := filepath.Join(p.Path, "collection.anki2")
+	collectionPth := filepath.Join(deck.Path, "collection.anki2")
 	// Add the database file to the zip
 	if err = addFileToZip(archive, collectionPth); err != nil {
 		return err
@@ -70,7 +70,7 @@ func addFileToZip(archive *zip.Writer, filePath string) error {
 		return err
 	}
 
-	if _, err := io.Copy(writer, file); err != nil {
+	if _, err = io.Copy(writer, file); err != nil {
 		return err
 	}
 

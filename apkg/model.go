@@ -42,7 +42,7 @@ type Note struct {
 	Usn  int    `gorm:"column:usn" json:"usn"`
 	Tags string `gorm:"column:tags" json:"tags"` // Space-separated string of tags.
 
-	// Flds - Fields of the note joined by 0x1f character.
+	// FLDs - Fields of the note joined by 0x1f character.
 	// They are used by card templates to generate "front" and "back" sides of cards.
 	//
 	// - "Basic" notes have "Front" and "Back" fields for basic question-answer cards.
@@ -50,18 +50,18 @@ type Note struct {
 	// - "Basic (optional reversed card)" has "Front", "Back", and "Add Reverse" fields, creating reversed cards when "Add Reverse" is filled.
 	// - "Cloze" notes are used to create fill-in-the-blank cards where text is omitted.
 	// - "Image Occlusion" notes utilize images with sections blocked out to test recognition of image parts.
-	Flds string `gorm:"column:flds" json:"flds"`
+	FLDs string `gorm:"column:flds" json:"flds"`
 
-	// Sfld - Sort field: the value of the field by which notes are sorted in the browser.
-	Sfld int `gorm:"column:sfld" json:"sfld"`
+	// SFLD - Sort field: the value of the field by which notes are sorted in the browser.
+	SFLD int `gorm:"column:sfld" json:"sfld"`
 
-	Csum  int64  `gorm:"column:csum" json:"csum"`   // Checksum used for duplicate check.
+	CSum  int64  `gorm:"column:csum" json:"csum"`   // Checksum used for duplicate check.
 	Flags int    `gorm:"column:flags" json:"flags"` // Flags
 	Data  string `gorm:"column:data" json:"data"`   // Unused, currently just an empty string.
 }
 
-func (n *Note) Front() string {
-	return strings.Split(n.Flds, SplitFieldOfNote)[0]
+func (n Note) Front() string {
+	return strings.Split(n.FLDs, SplitFieldOfNote)[0]
 }
 
 // todo: 猜测
@@ -125,8 +125,8 @@ type Card struct {
 	Data  string `gorm:"column:data" json:"data"`   // Unused, currently just an empty string.
 }
 
-// Revlog represents the 'revlog' table which stores the review logs of cards.
-type Revlog struct {
+// RevLog represents the 'revlog' table which stores the review logs of cards.
+type RevLog struct {
 	ID int64 `gorm:"primaryKey;column:id" json:"id"` // Timestamp (based on 13 digits), used as ID
 
 	Cid int `gorm:"column:cid" json:"cid"` // Card ID
@@ -161,12 +161,17 @@ func (Card) TableName() string {
 	return "cards"
 }
 
-func (Revlog) TableName() string {
+func (RevLog) TableName() string {
 	return "revlog"
 }
 
 func (Grave) TableName() string {
 	return "grave"
+}
+
+// AutoMigrateModels migrates the provided models and creates necessary indexes.
+func AutoMigrateModels(db *gorm.DB) error {
+	return db.AutoMigrate(&Col{}, &Note{}, &Card{}, &RevLog{}, &Grave{})
 }
 
 // CreateIndexes creates database indexes to improve query performance.

@@ -34,10 +34,6 @@ const (
 	NoteCFmtMarkdown                       = "markdown"
 )
 
-func (p *PkgInfo) NoteService() *NoteService {
-	return &NoteService{DB: p.DB}
-}
-
 func (no *NoteOptions) Use(opts ...NoteOption) *NoteOptions {
 	// Apply all options
 	for _, opt := range opts {
@@ -104,9 +100,9 @@ func (cs *NoteService) CreateNote(ctx context.Context, front, back string, opts 
 		Mod:  time.Now().Unix(),
 		//Usn:  cs.DB.GetNextUsn(), // Update Sequence Number
 		Tags: strings.Join(tags, " "),
-		Flds: flds,
-		Sfld: generateSortField(flds), // 生成排序字段
-		Csum: calculateChecksum(flds), // 内容校验和
+		FLDs: flds,
+		SFLD: generateSortField(flds), // 生成排序字段
+		CSum: calculateChecksum(flds), // 内容校验和
 	}
 
 	if err := cs.DB.Create(note).Error; err != nil {

@@ -15,7 +15,7 @@ import (
 // BuildAPKGsFromToml searches for .apkg.md files in the current directory and subdirectories
 // and generates .apkg files accordingly.
 func BuildAPKGsFromToml(ctx context.Context) error {
-	log := wlog.ByCtx(ctx, "BuildAPKGsFromToml")
+	log, ctx := wlog.ByCtxAndCache(ctx, "BuildAPKGsFromToml")
 
 	return filepath.Walk(".", func(pth string, info os.FileInfo, err error) error {
 		if !strings.HasSuffix(info.Name(), ".apkg.toml") {
@@ -36,19 +36,21 @@ func BuildAPKGsFromToml(ctx context.Context) error {
 		}
 
 		/* 这里注释下一步的代码，等到我们的 apkg 的包实现创建 apkg 文件的方法之后再解除注释 */
-		pkgInfo, err := apkg.CreatePkgInfo(ctx, outDir) // 你的输出文件夹路径
+		pkgInfo, err := apkg.CreateDeck(ctx, outDir) // 你的输出文件夹路径
 		if err != nil {
-			log.Fatalf("create pkg info failed, outPth= %s, err: %v", outDir, err)
+			log.WithField("pth", pth).Fatalf("create pkg info failed, outPth= %s, err: %v", outDir, err)
 		}
 		defer pkgInfo.Close()
 
 		if err = insertCards(ctx, confK, pkgInfo); err != nil {
+			log.WithField("pth", pth).Errorf("insert cards failed, err: %v", err)
 			return err
 		}
 
 		// If RuntimeEnabled is true, write back the runtime information to the TOML configuration file.
 		if confK.RuntimeEnabled {
 			if err = writeRuntimeBack(&confK, pth); err != nil {
+				log.WithField("pth", pth).Warnf("write runtime back failed, err: %v", err)
 				return err
 			}
 		}
@@ -57,7 +59,7 @@ func BuildAPKGsFromToml(ctx context.Context) error {
 
 }
 
-func insertCards(ctx context.Context, confK Barn, pkgInfo *apkg.PkgInfo) (err error) {
+func insertCards(ctx context.Context, confK Barn, pkgInfo *apkg.Deck) (err error) {
 	log := wlog.ByCtx(ctx, "insertCards")
 	log.Infof("confK.BarnSetting= %+v, runtime= %v", confK.BarnSetting, confK.RuntimeEnabled)
 
@@ -95,7 +97,7 @@ func insertCards(ctx context.Context, confK Barn, pkgInfo *apkg.PkgInfo) (err er
 		if c, err = pkgInfo.CardService().CreateCard(cardID, n); err != nil {
 			return err
 		}
-		log.Infof("card created，q= %s, n.flds= %s", cardConf.Question, n.Flds)
+		log.Infof("card created，q= %s, n.flds= %s", cardConf.Question, n.FLDs)
 
 		// Update and save runtime information if enabled
 		if confK.RuntimeEnabled {

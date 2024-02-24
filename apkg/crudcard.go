@@ -16,10 +16,6 @@ type CardService struct {
 	DB *gorm.DB
 }
 
-func (p *PkgInfo) CardService() *CardService {
-	return &CardService{DB: p.DB}
-}
-
 // CreateCard creates a new card based on the given front and back information.
 func (cs *CardService) CreateCard(cid int, note *Note) (*Card, error) {
 	// 创建Note
@@ -56,7 +52,7 @@ func (cs *CardService) GetAllFronts() ([]string, error) {
 
 	var fronts []string
 	for _, note := range notes {
-		fields := strings.Split(note.Flds, "\x1f")
+		fields := strings.Split(note.FLDs, "\x1f")
 		if len(fields) > 0 {
 			fronts = append(fronts, fields[0])
 		}
