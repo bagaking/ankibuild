@@ -1,6 +1,13 @@
 package main
 
-import "github.com/bagaking/ankibuild/apkg"
+import (
+	"context"
+	"github.com/bagaking/ankibuild/apkg"
+	"github.com/bagaking/goulp/wlog"
+	"os"
+	"path/filepath"
+	"strings"
+)
 
 type (
 	InheritableConf struct {
@@ -67,4 +74,36 @@ func (c *QnACard) GetCardID() int {
 		return c.Runtime.CardID
 	}
 	return 0
+}
+
+type TomlProcessor func(ctx context.Context, confK Barn, pth, outDir, fileName string) error
+
+func WalkTomlFiles(ctx context.Context, processor TomlProcessor) error {
+	return filepath.Walk(".", func(pth string, info os.FileInfo, err error) error {
+		if info == nil || !strings.HasSuffix(info.Name(), ".apkg.toml") {
+			return nil
+		}
+
+		if err != nil {
+			return err
+		}
+
+		log, ctxIn := wlog.ByCtxAndCache(ctx, "WalkTomlFiles")
+		log.WithField("pth", pth)
+
+		confK, err := parseConfigFromFile(pth)
+		if err != nil {
+			return err
+		}
+
+		log.Infof("find conf at path %s", pth)
+		outDir := filepath.Dir(pth)
+
+		fileName := strings.TrimSuffix(info.Name(), ".apkg.toml")
+		if confK.BarnSetting.Title != "" {
+			fileName = confK.BarnSetting.Title
+		}
+
+		return processor(ctxIn, confK, pth, outDir, fileName)
+	})
 }
