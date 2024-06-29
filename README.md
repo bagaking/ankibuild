@@ -27,6 +27,8 @@ To generate `.apkg` files:
 2. Make sure each `.apkg.toml` file follows the `KnowledgePage` struct defined in `conf.go`, which includes the title of the package and a slice of QnACards.
 3. Run the binary or use `go run main.go` to start the application. This will generate `.apkg` files in the origin directory.
 
+configuration detail @see [FORMAT](./FORMAT.md)
+
 ## Project Structure
 
 - `builder.go`: Contains the logic to parse `.apkg.toml` files and build `.apkg` files.

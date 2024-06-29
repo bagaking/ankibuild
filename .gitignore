@@ -15,11 +15,15 @@
 *.out
 *.apkg
 *.bak
+*.bundle.txt
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
 # Go workspace file
 go.work
+
+# misc
 .idea
-_bundle
+
+
