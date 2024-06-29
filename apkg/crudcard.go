@@ -67,7 +67,7 @@ func (cs *CardService) GetAllFronts() ([]string, error) {
 // FindCardByFront finds notes and cards with the given front.
 func (cs *CardService) FindCardByFront(front string) ([]Note, []Card, error) {
 	var notes []Note
-	if err := cs.DB.Where("flds LIKE ?", front+"%").Find(&notes).Error; err != nil {
+	if err := cs.DB.Where("flds = ? OR flds LIKE ?", front, front+SplitFieldOfNote+"%").Find(&notes).Error; err != nil {
 		return nil, nil, err
 	}
 
