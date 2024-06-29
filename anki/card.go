@@ -35,14 +35,14 @@ func (c *QnACard) GetNoteID() int {
 }
 
 func (c *QnACard) GetNoteGUID() string {
-	if c.Runtime == nil || c.Runtime.NoteGUID != "" {
+	if c.Runtime == nil || c.Runtime.NoteGUID == "" {
 		return ""
 	}
 	return c.Runtime.NoteGUID
 }
 
 func (c *QnACard) GetCardID() int {
-	if c.Runtime == nil || c.Runtime.CardID != 0 {
+	if c.Runtime == nil || c.Runtime.CardID == 0 {
 		return 0
 	}
 	return c.Runtime.CardID
