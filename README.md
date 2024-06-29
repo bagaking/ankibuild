@@ -27,7 +27,17 @@ To generate `.apkg` files:
 2. Make sure each `.apkg.toml` file follows the `KnowledgePage` struct defined in `conf.go`, which includes the title of the package and a slice of QnACards.
 3. Run the binary or use `go run .` to start the application. This will generate `.apkg` files in the origin directory.
 
-configuration detail @see [FORMAT](./anki/FORMAT.md)
+See [FORMAT](./anki/FORMAT.md) for configuration details.
+
+## Local Validation
+
+Run the local test suite with:
+
+```sh
+make test
+```
+
+The `make test` target runs `go test ./...`.
 
 ## Project Structure
 
