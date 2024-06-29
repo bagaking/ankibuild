@@ -90,6 +90,11 @@ func TestFindCardByFrontTreatsLikeWildcardsAsLiterals(t *testing.T) {
 			front:          "card_1",
 			collisionFront: "cardx1",
 		},
+		{
+			name:           "backslash",
+			front:          `path\card`,
+			collisionFront: `pathcard`,
+		},
 	}
 
 	for _, tt := range tests {
