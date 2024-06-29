@@ -19,7 +19,7 @@ type Storage struct {
 // CreateStorage initializes and returns a new Storage with a connected database.
 func CreateStorage(ctx context.Context, fPath, dbName string, initial func(db *gorm.DB) error) (*Storage, error) {
 	log := wlog.ByCtx(ctx, "CreateStorage")
-	err := os.MkdirAll(fPath, 0755)
+	err := os.MkdirAll(fPath, 0o755)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create directory: %v", err)
 	}
@@ -78,7 +78,6 @@ func CreateInMemStorage(ctx context.Context, initial func(db *gorm.DB) error) (*
 
 func (p *Storage) Close() error {
 	sqlDB, err := p.DB.DB()
-
 	if err != nil {
 		return fmt.Errorf("failed to get generic database object: %v", err)
 	}

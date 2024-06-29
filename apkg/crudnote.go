@@ -98,7 +98,7 @@ func (cs *NoteService) CreateNote(ctx context.Context, front, back string, opts 
 		Guid: options.GUID,
 		Mid:  SimpleTplID, //  collection.ModelsID, // 模板ID
 		Mod:  time.Now().Unix(),
-		//Usn:  cs.DB.GetNextUsn(), // Update Sequence Number
+		// Usn:  cs.DB.GetNextUsn(), // Update Sequence Number
 		Tags: strings.Join(tags, " "),
 		FLDs: flds,
 		SFLD: generateSortField(flds), // 生成排序字段

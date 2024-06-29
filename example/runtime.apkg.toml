@@ -1,13 +1,13 @@
 title = "RuntimeExampleBarn"
+runtime = true
 tags = ["complexity"]
 content_fmt = "markdown"
-runtime = true
 
 [[q_a]]
+  tags = ["algorithms", "complexity"]
   question = "this is a runtime example"
   answer = "# runtime ans\n\n  - 1\n  "
-  tags = ["algorithms", "complexity"]
   [q_a.runtime]
-    cid = 1705923679008
+    cid = 1719645923007
     nid = 1705923679007
-    guid = "cHuNXOn9hM"
+    guid = "IlVdoT4qTQ"

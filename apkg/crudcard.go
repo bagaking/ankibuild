@@ -2,14 +2,17 @@ package apkg
 
 import (
 	"errors"
-	"gorm.io/gorm"
 	"strings"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // ErrNoteNotFound is returned when a note cannot be found.
-var ErrNoteNotFound = errors.New("note not found")
-var GlobalTags = []string{}
+var (
+	ErrNoteNotFound = errors.New("note not found")
+	GlobalTags      = []string{}
+)
 
 // CardService provides methods to work with notes and cards.
 type CardService struct {
@@ -28,11 +31,11 @@ func (cs *CardService) CreateCard(cid int, note *Note) (*Card, error) {
 		NID: note.ID,
 		DID: VirtualDeckID, // Deck ID
 		Mod: time.Now().Unix(),
-		//Usn:   cs.DB.GetNextUsn(), // Update Sequence Number
+		// Usn:   cs.DB.GetNextUsn(), // Update Sequence Number
 		Type:  CardTypeNew,
 		Queue: CardQueueTypeNew,
-		//Due:   cs.DB.GetNextDue(deck),
-		//Ivl:   DefaultInitialInterval,
+		// Due:   cs.DB.GetNextDue(deck),
+		// Ivl:   DefaultInitialInterval,
 		// Set other necessary Card fields based on your business logic
 	}
 

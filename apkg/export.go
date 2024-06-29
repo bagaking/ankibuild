@@ -1,11 +1,10 @@
 package apkg
 
 import (
+	"archive/zip"
 	"io"
 	"os"
 	"path/filepath"
-
-	"archive/zip"
 )
 
 // ExportToAPKG exports the database and associated files as an .apkg file.
@@ -13,7 +12,7 @@ func (deck *Deck) ExportToAPKG(exportPath string) error {
 	// Close the database to ensure no pending operations
 	deck.Close()
 
-	aPkgName := exportPath //filepath.Join(exportPath, "collection.apkg")
+	aPkgName := exportPath // filepath.Join(exportPath, "collection.apkg")
 	// Create a new zip file
 	zipFile, err := os.Create(aPkgName)
 	if err != nil {

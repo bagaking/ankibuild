@@ -2,21 +2,20 @@ package main
 
 import (
 	"context"
+	"path/filepath"
+	"strconv"
+
+	"github.com/bagaking/ankibuild/anki"
 	"github.com/bagaking/ankibuild/apkg"
 	"github.com/bagaking/goulp/wlog"
 	"github.com/khicago/irr"
-	"github.com/pelletier/go-toml"
 	"github.com/xuri/excelize/v2"
-	"log"
-	"os"
-	"path/filepath"
-	"strconv"
 )
 
 // BuildAPKGsFromToml searches for .apkg.md files in the current directory and subdirectories
 // and generates .apkg files accordingly.
 func BuildAPKGsFromToml(ctx context.Context) error {
-	return WalkTomlFiles(ctx, func(ctx context.Context, confK Barn, pth, outDir, fileName string) error {
+	return WalkTomlFiles(ctx, func(ctx context.Context, confK anki.Barn, pth, outDir, fileName string) error {
 		logger := wlog.ByCtx(ctx, "BuildAPKGsFromToml")
 
 		/* 这里注释下一步的代码，等到我们的 apkg 的包实现创建 apkg 文件的方法之后再解除注释 */
@@ -42,11 +41,11 @@ func BuildAPKGsFromToml(ctx context.Context) error {
 	})
 }
 
-func insertCards(ctx context.Context, confK Barn, pkgInfo *apkg.Deck) (err error) {
+func insertCards(ctx context.Context, confK anki.Barn, pkgInfo *apkg.Deck) (err error) {
 	log := wlog.ByCtx(ctx, "insertCards")
 	log.Infof("confK.BarnSetting= %+v, runtime= %v", confK.BarnSetting, confK.RuntimeEnabled)
 
-	//创建每个卡片并添加到 apkg 包中
+	// 创建每个卡片并添加到 apkg 包中
 	for i := range confK.QnAs {
 		cardConf := confK.QnAs[i]
 		log.Infof("to create card，q= %+v", cardConf.Question)
@@ -95,7 +94,7 @@ func insertCards(ctx context.Context, confK Barn, pkgInfo *apkg.Deck) (err error
 }
 
 func BuildExcelsFromToml(ctx context.Context) error {
-	return WalkTomlFiles(ctx, func(ctx context.Context, confK Barn, pth, outDir, fileName string) error {
+	return WalkTomlFiles(ctx, func(ctx context.Context, confK anki.Barn, pth, outDir, fileName string) error {
 		logger := wlog.ByCtx(ctx, "BuildExcelsFromToml")
 
 		// Assume we have a slice of QnACard called cardsToExport
@@ -134,23 +133,4 @@ func BuildExcelsFromToml(ctx context.Context) error {
 		}
 		return nil
 	})
-
-}
-
-// parseConfigFromFile takes a file path and parses the .apkg.md config file.
-func parseConfigFromFile(filePath string) (Barn, error) {
-	// 读取 TOML 文件内容
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var knowledge Barn
-
-	// 使用toml库解析文件内容
-	if err = toml.Unmarshal(content, &knowledge); err != nil {
-		return knowledge, err
-	}
-
-	return knowledge, nil
 }

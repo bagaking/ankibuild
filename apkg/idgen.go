@@ -10,8 +10,10 @@ import (
 )
 
 // Counter for appending to the Unix timestamp to create unique IDs. This is not thread-safe.
-var counter int64 = 0
-var mutexIDGen sync.Mutex
+var (
+	counter    int64 = 0
+	mutexIDGen sync.Mutex
+)
 
 // genID generates a unique ID based on current time and an incrementing counter.
 func genID() int {

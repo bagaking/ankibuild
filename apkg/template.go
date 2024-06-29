@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/khicago/irr"
 	"time"
 
 	"gorm.io/gorm"
@@ -123,7 +124,7 @@ func findOrMockSimpleDeck(db *gorm.DB) (*Col, error) {
 		return mockSimpleDeck(db, SimpleTplID)
 	} else if err != nil {
 		// 如果发生了其他错误，则返回错误
-		return nil, err
+		return nil, irr.Wrap(err, "internal error, fetch simple deck failed")
 	}
 
 	return &col, nil
