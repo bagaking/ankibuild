@@ -11,7 +11,7 @@ This project facilitates the creation of Anki flashcard packages by providing a 
 1. Clone the repository.
 2. Navigate to the root directory of the project.
 3. Make sure you have Go installed on your machine.
-4. Run `go build` to build the binary or `go run main.go` to directly run the application.
+4. Run `go build` to build the binary or `go run .` to directly run the application.
 
 ### Example
 
@@ -25,7 +25,7 @@ To generate `.apkg` files:
 
 1. Define your flashcards in `.apkg.toml` files within the project directory.
 2. Make sure each `.apkg.toml` file follows the `KnowledgePage` struct defined in `conf.go`, which includes the title of the package and a slice of QnACards.
-3. Run the binary or use `go run main.go` to start the application. This will generate `.apkg` files in the origin directory.
+3. Run the binary or use `go run .` to start the application. This will generate `.apkg` files in the origin directory.
 
 configuration detail @see [FORMAT](./anki/FORMAT.md)
 
