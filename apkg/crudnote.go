@@ -89,7 +89,7 @@ func (cs *NoteService) CreateNote(ctx context.Context, front, back string, opts 
 	default:
 	}
 
-	tags := append(GlobalTags, options.Tags...)
+	tags := append(append([]string(nil), GlobalTags...), options.Tags...)
 
 	flds := makeFlds(front, back)
 	// 创建Note

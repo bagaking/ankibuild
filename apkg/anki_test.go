@@ -2,6 +2,7 @@ package apkg
 
 import (
 	"context"
+	"reflect"
 	"testing"
 
 	"gorm.io/gorm"
@@ -138,6 +139,29 @@ func TestFindCardByFrontTreatsLikeWildcardsAsLiterals(t *testing.T) {
 				t.Errorf("FindCardByFront(%q) card ID = %d, want %d", tt.front, got, want)
 			}
 		})
+	}
+}
+
+func TestCreateNoteDoesNotMutateGlobalTagsBackingArray(t *testing.T) {
+	_, noteService, cleanup := newTestCardAndNoteServices(t)
+	defer cleanup()
+
+	originalGlobalTags := GlobalTags
+	t.Cleanup(func() {
+		GlobalTags = originalGlobalTags
+	})
+
+	GlobalTags = make([]string, 1, 3)
+	GlobalTags[0] = "global"
+
+	if _, err := noteService.CreateNote(context.Background(), "front", "back", NoteWithNID(501), NoteWithGUID("tagstest"), NoteWithTags("local")); err != nil {
+		t.Fatalf("CreateNote(context.Background(), %q, %q, NoteWithTags(%q)) error = %v, want nil", "front", "back", "local", err)
+	}
+
+	got := GlobalTags[:cap(GlobalTags)]
+	want := []string{"global", "", ""}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("CreateNote(context.Background(), %q, %q, NoteWithTags(%q)) mutated GlobalTags backing array = %v, want %v", "front", "back", "local", got, want)
 	}
 }
 
