@@ -46,7 +46,7 @@ func CreateDeck(ctx context.Context, fPath string) (*Deck, error) {
 
 func (deck *Deck) Col() *Col {
 	deckCol, err := findOrMockSimpleDeck(deck.DB)
-	if err == nil {
+	if err != nil {
 		return nil
 	}
 	return deckCol
