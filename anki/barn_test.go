@@ -2,6 +2,7 @@ package anki
 
 import (
 	"context"
+	"reflect"
 	"testing"
 )
 
@@ -80,5 +81,141 @@ question = "missing quote
 
 	if got, err := ParseTomlContent(context.Background(), content); err == nil {
 		t.Fatalf("ParseTomlContent(invalid TOML) = %#v, nil error; want non-nil error", got)
+	}
+}
+
+func TestParseTomlContentHandlesTOMLBoundaries(t *testing.T) {
+	tests := []struct {
+		name    string
+		content []byte
+		want    *Barn
+		wantErr bool
+	}{
+		{
+			name: "unknown fields ignored but known fields parse",
+			content: []byte(`
+title = "KnownTitle"
+unexpected_root = "ignored"
+runtime = true
+
+[[q_a]]
+question = "known question"
+answer = "known answer"
+unexpected_card = "ignored"
+`),
+			want: &Barn{
+				BarnSetting: BarnSetting{
+					Title:          "KnownTitle",
+					RuntimeEnabled: true,
+				},
+				QnAs: []QnACard{
+					{
+						Question: "known question",
+						Answer:   "known answer",
+					},
+				},
+			},
+		},
+		{
+			name: "multiple q_a cards",
+			content: []byte(`
+title = "TwoCards"
+
+[[q_a]]
+question = "first question"
+answer = "first answer"
+tags = ["first"]
+
+[[q_a]]
+question = "second question"
+answer = "second answer"
+content_fmt = "markdown"
+`),
+			want: &Barn{
+				BarnSetting: BarnSetting{Title: "TwoCards"},
+				QnAs: []QnACard{
+					{
+						Meta:     Meta{Tags: []string{"first"}},
+						Question: "first question",
+						Answer:   "first answer",
+					},
+					{
+						Meta:     Meta{ContentFormatter: "markdown"},
+						Question: "second question",
+						Answer:   "second answer",
+					},
+				},
+			},
+		},
+		{
+			name: "missing runtime table leaves Runtime nil",
+			content: []byte(`
+[[q_a]]
+question = "no runtime"
+answer = "no runtime answer"
+`),
+			want: &Barn{
+				QnAs: []QnACard{
+					{
+						Question: "no runtime",
+						Answer:   "no runtime answer",
+					},
+				},
+			},
+		},
+		{
+			name: "runtime false still parses per-card runtime data",
+			content: []byte(`
+runtime = false
+
+[[q_a]]
+question = "stored runtime"
+answer = "kept even when barn runtime writes are disabled"
+
+[q_a.runtime]
+cid = 11
+nid = 22
+guid = "note-guid"
+`),
+			want: &Barn{
+				BarnSetting: BarnSetting{RuntimeEnabled: false},
+				QnAs: []QnACard{
+					{
+						Question: "stored runtime",
+						Answer:   "kept even when barn runtime writes are disabled",
+						Runtime: &Runtime{
+							CardID:   11,
+							NoteID:   22,
+							NoteGUID: "note-guid",
+						},
+					},
+				},
+			},
+		},
+		{
+			name:    "invalid type returns error",
+			content: []byte(`runtime = "not a bool"`),
+			wantErr: true,
+		},
+		{
+			name:    "empty content parses as zero-value Barn",
+			content: []byte{},
+			want:    &Barn{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ParseTomlContent(context.Background(), tt.content)
+			if gotErr := err != nil; gotErr != tt.wantErr {
+				t.Fatalf("ParseTomlContent(%q) error = %v, want error presence = %t", tt.name, err, tt.wantErr)
+			}
+			if tt.wantErr {
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ParseTomlContent(%q) = %#v, want %#v", tt.name, got, tt.want)
+			}
+		})
 	}
 }
