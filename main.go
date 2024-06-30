@@ -11,10 +11,11 @@ var exportFormat string
 
 func init() {
 	flag.StringVar(&exportFormat, "format", "apkg", "The export format: 'apkg' or 'excel'")
-	flag.Parse()
 }
 
 func main() {
+	flag.Parse()
+
 	ctx := context.Background()
 	var err error
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 	"strconv"
 
@@ -18,7 +19,10 @@ func BuildAPKGsFromToml(ctx context.Context) error {
 	return WalkTomlFiles(ctx, func(ctx context.Context, confK anki.Barn, pth, outDir, fileName string) error {
 		logger := wlog.ByCtx(ctx, "BuildAPKGsFromToml")
 
-		/* 这里注释下一步的代码，等到我们的 apkg 的包实现创建 apkg 文件的方法之后再解除注释 */
+		if err := validateBuildInput(confK, pth); err != nil {
+			return err
+		}
+
 		pkgInfo, err := apkg.CreateDeck(ctx, outDir) // 你的输出文件夹路径
 		if err != nil {
 			logger.Fatalf("create pkg info failed, outPth= %s, err: %v", outDir, err)
@@ -97,6 +101,10 @@ func BuildExcelsFromToml(ctx context.Context) error {
 	return WalkTomlFiles(ctx, func(ctx context.Context, confK anki.Barn, pth, outDir, fileName string) error {
 		logger := wlog.ByCtx(ctx, "BuildExcelsFromToml")
 
+		if err := validateBuildInput(confK, pth); err != nil {
+			return err
+		}
+
 		// Assume we have a slice of QnACard called cardsToExport
 		f := excelize.NewFile()
 		defer func() {
@@ -133,4 +141,11 @@ func BuildExcelsFromToml(ctx context.Context) error {
 		}
 		return nil
 	})
+}
+
+func validateBuildInput(confK anki.Barn, pth string) error {
+	if len(confK.QnAs) == 0 {
+		return fmt.Errorf("%s has no q_a cards", pth)
+	}
+	return nil
 }
