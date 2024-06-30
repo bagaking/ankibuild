@@ -53,6 +53,9 @@ func TestExportToAPKGWritesCollectionAtArchiveRoot(t *testing.T) {
 			if got := file.UncompressedSize64; got == 0 {
 				t.Errorf("zip.OpenReader(%q).File[%d].UncompressedSize64 = %d, want non-zero", exportPath, i, got)
 			}
+			if got := file.Modified; !got.Equal(zipEntryDeterministicModifiedTime) {
+				t.Errorf("zip.OpenReader(%q).File[%d].Modified = %v, want %v", exportPath, i, got, zipEntryDeterministicModifiedTime)
+			}
 		})
 	}
 

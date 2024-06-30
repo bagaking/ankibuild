@@ -5,7 +5,10 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 )
+
+var zipEntryDeterministicModifiedTime = time.Date(1980, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 // ExportToAPKG exports the database and associated files as an .apkg file.
 func (deck *Deck) ExportToAPKG(exportPath string) error {
@@ -63,6 +66,7 @@ func addFileToZip(archive *zip.Writer, filePath string) error {
 
 	header.Name = filepath.Base(filePath)
 	header.Method = zip.Deflate // The compression algorithm
+	header.Modified = zipEntryDeterministicModifiedTime
 
 	writer, err := archive.CreateHeader(header)
 	if err != nil {
