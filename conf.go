@@ -14,12 +14,11 @@ type TomlProcessor func(ctx context.Context, confK anki.Barn, pth, outDir, fileN
 
 func WalkTomlFiles(ctx context.Context, processor TomlProcessor) error {
 	return filepath.Walk(".", func(pth string, info os.FileInfo, err error) error {
-		if info == nil || !strings.HasSuffix(info.Name(), ".apkg.toml") {
-			return nil
-		}
-
 		if err != nil {
 			return err
+		}
+		if info == nil || !strings.HasSuffix(info.Name(), ".apkg.toml") {
+			return nil
 		}
 
 		log, ctxIn := wlog.ByCtxAndCache(ctx, "WalkTomlFiles")
