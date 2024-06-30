@@ -2,6 +2,8 @@ package apkg
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -31,6 +33,68 @@ func TestDeckColReturnsInitializedCollection(t *testing.T) {
 	}
 	if col.Decks == "" {
 		t.Errorf("Deck.Col().Decks = %q, want non-empty decks JSON", col.Decks)
+	}
+
+	var models map[string]TplModel
+	if err := json.Unmarshal([]byte(col.Models), &models); err != nil {
+		t.Fatalf("json.Unmarshal(Deck.Col().Models) error = %v, want nil", err)
+	}
+	simpleTplKey := fmt.Sprintf("%d", SimpleTplID)
+	simpleTpl, ok := models[simpleTplKey]
+	if !ok {
+		t.Fatalf("json.Unmarshal(Deck.Col().Models)[%q] present = %t, want true", simpleTplKey, ok)
+	}
+	if got, want := simpleTpl.ID, SimpleTplID; got != want {
+		t.Errorf("json.Unmarshal(Deck.Col().Models)[%q].ID = %d, want %d", simpleTplKey, got, want)
+	}
+	if got, want := simpleTpl.Name, VirtualDeckName+".TPL"; got != want {
+		t.Errorf("json.Unmarshal(Deck.Col().Models)[%q].Name = %q, want %q", simpleTplKey, got, want)
+	}
+	if got, want := len(simpleTpl.Flds), 2; got != want {
+		t.Fatalf("json.Unmarshal(Deck.Col().Models)[%q].Flds length = %d, want %d", simpleTplKey, got, want)
+	}
+	if got, want := simpleTpl.Flds[0].Name, "正面"; got != want {
+		t.Errorf("json.Unmarshal(Deck.Col().Models)[%q].Flds[0].Name = %q, want %q", simpleTplKey, got, want)
+	}
+	if got, want := simpleTpl.Flds[0].Ord, 0; got != want {
+		t.Errorf("json.Unmarshal(Deck.Col().Models)[%q].Flds[0].Ord = %d, want %d", simpleTplKey, got, want)
+	}
+	if got, want := simpleTpl.Flds[1].Name, "背面"; got != want {
+		t.Errorf("json.Unmarshal(Deck.Col().Models)[%q].Flds[1].Name = %q, want %q", simpleTplKey, got, want)
+	}
+	if got, want := simpleTpl.Flds[1].Ord, 1; got != want {
+		t.Errorf("json.Unmarshal(Deck.Col().Models)[%q].Flds[1].Ord = %d, want %d", simpleTplKey, got, want)
+	}
+	if got, want := len(simpleTpl.Tmpls), 1; got != want {
+		t.Fatalf("json.Unmarshal(Deck.Col().Models)[%q].Tmpls length = %d, want %d", simpleTplKey, got, want)
+	}
+	if got, want := simpleTpl.Tmpls[0].Name, "问答卡片"; got != want {
+		t.Errorf("json.Unmarshal(Deck.Col().Models)[%q].Tmpls[0].Name = %q, want %q", simpleTplKey, got, want)
+	}
+	if got, want := simpleTpl.Tmpls[0].Qfmt, "{{正面}}"; got != want {
+		t.Errorf("json.Unmarshal(Deck.Col().Models)[%q].Tmpls[0].Qfmt = %q, want %q", simpleTplKey, got, want)
+	}
+	if got, want := simpleTpl.Tmpls[0].Afmt, "{{FrontSide}}{{背面}}"; got != want {
+		t.Errorf("json.Unmarshal(Deck.Col().Models)[%q].Tmpls[0].Afmt = %q, want %q", simpleTplKey, got, want)
+	}
+
+	var decks map[string]struct {
+		ID   int    `json:"id"`
+		Name string `json:"name"`
+	}
+	if err := json.Unmarshal([]byte(col.Decks), &decks); err != nil {
+		t.Fatalf("json.Unmarshal(Deck.Col().Decks) error = %v, want nil", err)
+	}
+	virtualDeckKey := fmt.Sprintf("%d", VirtualDeckID)
+	virtualDeck, ok := decks[virtualDeckKey]
+	if !ok {
+		t.Fatalf("json.Unmarshal(Deck.Col().Decks)[%q] present = %t, want true", virtualDeckKey, ok)
+	}
+	if got, want := virtualDeck.ID, VirtualDeckID; got != want {
+		t.Errorf("json.Unmarshal(Deck.Col().Decks)[%q].ID = %d, want %d", virtualDeckKey, got, want)
+	}
+	if got, want := virtualDeck.Name, VirtualDeckName; got != want {
+		t.Errorf("json.Unmarshal(Deck.Col().Decks)[%q].Name = %q, want %q", virtualDeckKey, got, want)
 	}
 }
 
