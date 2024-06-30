@@ -2,7 +2,8 @@ package anki
 
 import (
 	"context"
-	"reflect"
+	"fmt"
+	"slices"
 	"testing"
 )
 
@@ -213,9 +214,74 @@ guid = "note-guid"
 			if tt.wantErr {
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ParseTomlContent(%q) = %#v, want %#v", tt.name, got, tt.want)
-			}
+			assertBarnEqual(t, tt.want, got)
 		})
+	}
+}
+
+func assertBarnEqual(t *testing.T, want, got *Barn) {
+	t.Helper()
+	if want == nil || got == nil {
+		if want != got {
+			t.Fatalf("Barn = %#v, want %#v", got, want)
+		}
+		return
+	}
+
+	if got.Title != want.Title {
+		t.Errorf("Barn.Title = %q, want %q", got.Title, want.Title)
+	}
+	if got.RuntimeEnabled != want.RuntimeEnabled {
+		t.Errorf("Barn.RuntimeEnabled = %t, want %t", got.RuntimeEnabled, want.RuntimeEnabled)
+	}
+	assertMetaEqual(t, "Barn.Meta", want.Meta, got.Meta)
+
+	if len(got.QnAs) != len(want.QnAs) {
+		t.Fatalf("Barn.QnAs length = %d, want %d", len(got.QnAs), len(want.QnAs))
+	}
+	for i := range want.QnAs {
+		path := fmt.Sprintf("Barn.QnAs[%d]", i)
+		assertQnACardEqual(t, path, want.QnAs[i], got.QnAs[i])
+	}
+}
+
+func assertQnACardEqual(t *testing.T, path string, want, got QnACard) {
+	t.Helper()
+	assertMetaEqual(t, path+".Meta", want.Meta, got.Meta)
+	if got.Question != want.Question {
+		t.Errorf("%s.Question = %q, want %q", path, got.Question, want.Question)
+	}
+	if got.Answer != want.Answer {
+		t.Errorf("%s.Answer = %q, want %q", path, got.Answer, want.Answer)
+	}
+	assertRuntimeEqual(t, path+".Runtime", want.Runtime, got.Runtime)
+}
+
+func assertMetaEqual(t *testing.T, path string, want, got Meta) {
+	t.Helper()
+	if !slices.Equal(got.Tags, want.Tags) {
+		t.Errorf("%s.Tags = %v, want %v", path, got.Tags, want.Tags)
+	}
+	if got.ContentFormatter != want.ContentFormatter {
+		t.Errorf("%s.ContentFormatter = %q, want %q", path, got.ContentFormatter, want.ContentFormatter)
+	}
+}
+
+func assertRuntimeEqual(t *testing.T, path string, want, got *Runtime) {
+	t.Helper()
+	if want == nil || got == nil {
+		if want != got {
+			t.Errorf("%s = %#v, want %#v", path, got, want)
+		}
+		return
+	}
+	if got.CardID != want.CardID {
+		t.Errorf("%s.CardID = %d, want %d", path, got.CardID, want.CardID)
+	}
+	if got.NoteID != want.NoteID {
+		t.Errorf("%s.NoteID = %d, want %d", path, got.NoteID, want.NoteID)
+	}
+	if got.NoteGUID != want.NoteGUID {
+		t.Errorf("%s.NoteGUID = %q, want %q", path, got.NoteGUID, want.NoteGUID)
 	}
 }
