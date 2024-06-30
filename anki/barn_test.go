@@ -236,6 +236,9 @@ func assertBarnEqual(t *testing.T, want, got *Barn) {
 	}
 	assertMetaEqual(t, "Barn.Meta", want.Meta, got.Meta)
 
+	if (got.QnAs == nil) != (want.QnAs == nil) {
+		t.Fatalf("Barn.QnAs nil = %t, want %t", got.QnAs == nil, want.QnAs == nil)
+	}
 	if len(got.QnAs) != len(want.QnAs) {
 		t.Fatalf("Barn.QnAs length = %d, want %d", len(got.QnAs), len(want.QnAs))
 	}
@@ -259,6 +262,10 @@ func assertQnACardEqual(t *testing.T, path string, want, got QnACard) {
 
 func assertMetaEqual(t *testing.T, path string, want, got Meta) {
 	t.Helper()
+	if (got.Tags == nil) != (want.Tags == nil) {
+		t.Errorf("%s.Tags nil = %t, want %t", path, got.Tags == nil, want.Tags == nil)
+		return
+	}
 	if !slices.Equal(got.Tags, want.Tags) {
 		t.Errorf("%s.Tags = %v, want %v", path, got.Tags, want.Tags)
 	}
